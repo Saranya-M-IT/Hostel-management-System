@@ -1,0 +1,5 @@
+com\hostelhub\ComplaintControllerTest.class
+com\hostelhub\GateControllerTest.class
+com\hostelhub\LeaveControllerTest.class
+com\hostelhub\RoomControllerTest.class
+com\hostelhub\AuthControllerTest.class

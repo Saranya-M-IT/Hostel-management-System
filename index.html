@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hostel Management System - Admin, Warden & Student Portal</title>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+  <!-- =========================================================================
+       FIRST SCREEN: SPLIT LANDING & LOGIN PAGE (MATCHING SCREENSHOT)
+       ========================================================================= -->
+  <div id="login-landing-view" class="split-login-wrapper">
+    <!-- Left Section: Branding & Features Highlights -->
+    <div class="split-login-left">
+      <div class="split-brand-box">
+        <div class="split-brand-icon">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <h1 class="split-brand-title">HostelHub</h1>
+        <p class="split-brand-desc">
+          A complete residence management platform — rooms, fees,complaints and more, in one dashboard.
+        </p>
+
+        <ul class="split-features-list">
+          <li><i class="fa-solid fa-check"></i> Real-time room occupancy</li>
+
+          <li><i class="fa-solid fa-check"></i> Complaint & leave workflows</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right Section: Login Card -->
+    <div class="split-login-right">
+      <div class="login-card-container">
+        <!-- Role Tabs -->
+        <div class="split-role-tabs">
+          <button type="button" class="split-role-btn active" id="tab-admin" onclick="app.setLoginTab('admin')">
+            <i class="fa-solid fa-user-shield"></i> Admin
+          </button>
+          <button type="button" class="split-role-btn" id="tab-warden" onclick="app.setLoginTab('warden')">
+            <i class="fa-solid fa-user-nurse"></i> Warden
+          </button>
+          <button type="button" class="split-role-btn" id="tab-student" onclick="app.setLoginTab('student')">
+            <i class="fa-solid fa-user-graduate"></i> Student
+          </button>
+        </div>
+
+        <!-- Student Auth Sub-Bar (Sign In vs Register Account) -->
+        <div id="student-sub-toggle" class="student-sub-bar" style="display: none;">
+          <button type="button" class="sub-toggle-btn active" id="btn-mode-signin"
+            onclick="app.toggleStudentAuthMode('signin')">
+            <i class="fa-solid fa-right-to-bracket"></i> Sign In
+          </button>
+          <button type="button" class="sub-toggle-btn" id="btn-mode-register"
+            onclick="app.toggleStudentAuthMode('register')">
+            <i class="fa-solid fa-user-plus"></i> Register New Student
+          </button>
+        </div>
+
+        <div class="login-card-header" id="split-card-header">
+          <div class="welcome-icon">
+            <i class="fa-solid fa-user-lock"></i>
+          </div>
+          <h2 id="card-header-title">Welcome back</h2>
+          <p id="card-header-subtitle">Sign in to manage your hostel</p>
+        </div>
+
+        <!-- Sign In Form -->
+        <form id="split-login-form" onsubmit="app.handleSplitLogin(event)">
+          <input type="hidden" id="login-tab-role" value="admin">
+
+          <div id="split-login-error" class="login-alert-danger" style="display: none; margin-bottom: 1rem;">
+            <i class="fa-solid fa-circle-exclamation"></i> <span id="split-login-error-msg">Invalid credentials.</span>
+          </div>
+
+          <div class="input-field-wrap">
+            <label for="split-username">Username / ID / Email</label>
+            <div class="input-icon-box">
+              <i class="fa-solid fa-user"></i>
+              <input type="text" id="split-username" class="split-input" placeholder="e.g. admin123@gmail.com" required>
+            </div>
+          </div>
+
+          <div class="input-field-wrap">
+            <label for="split-password">Password</label>
+            <div class="input-icon-box">
+              <i class="fa-solid fa-key"></i>
+              <input type="password" id="split-password" class="split-input" placeholder="••••••••" required>
+              <button type="button" class="password-toggle-btn" onclick="app.toggleSplitPassword()">
+                <i class="fa-solid fa-eye" id="split-eye-icon"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="split-submit-btn">
+            <i class="fa-solid fa-right-to-bracket"></i> Sign In
+          </button>
+          <!-- <div class="demo-login-hint">
+          Demo login — <span id="demo-credentials-text" class="demo-clickable"
+              onclick="app.fillSplitDemoCredentials()"><strong>admin / admin123</strong></span>
+            </div> -->
+        </form>
+
+        <!-- Student Registration Form (Visible when student registers) -->
+        <form id="split-register-form" style="display: none;" onsubmit="app.handleLandingStudentRegister(event)">
+          <div class="register-form-scroll">
+            <div class="input-field-wrap">
+              <label for="land-reg-name">Full Name *</label>
+              <div class="input-icon-box">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="land-reg-name" class="split-input" placeholder="e.g. Alex Morgan" required>
+              </div>
+            </div>
+
+            <div class="input-field-wrap">
+              <label for="land-reg-email">Email Address *</label>
+              <div class="input-icon-box">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="land-reg-email" class="split-input" placeholder="alex@student.edu" required>
+              </div>
+            </div>
+
+            <div class="input-field-wrap">
+              <label for="land-reg-password">Create Passcode *</label>
+              <div class="input-icon-box">
+                <i class="fa-solid fa-key"></i>
+                <input type="password" id="land-reg-password" class="split-input" placeholder="Set password (min 6 chars)..." required>
+              </div>
+            </div>
+
+            <div class="input-field-wrap">
+              <label for="land-reg-confirm-password">Confirm Passcode *</label>
+              <div class="input-icon-box">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="land-reg-confirm-password" class="split-input" placeholder="Confirm password..." required>
+              </div>
+            </div>
+
+            <div class="input-field-wrap">
+              <label for="land-reg-phone">Contact Phone *</label>
+              <div class="input-icon-box">
+                <i class="fa-solid fa-phone"></i>
+                <input type="tel" id="land-reg-phone" class="split-input" placeholder="+1 (555) 111-2233" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="input-field-wrap">
+                <label for="land-reg-dept">Department *</label>
+                <input type="text" id="land-reg-dept" class="split-input" placeholder="e.g. Computer Science" required
+                  style="padding-left: 0.9rem;">
+              </div>
+              <div class="input-field-wrap">
+                <label for="land-reg-year">Year *</label>
+                <select id="land-reg-year" class="split-input" required style="padding-left: 0.9rem;">
+                  <option value="1st Year">1st Year</option>
+                  <option value="2nd Year">2nd Year</option>
+                  <option value="3rd Year">3rd Year</option>
+                  <option value="4th Year">4th Year</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-field-wrap">
+              <label for="land-reg-gender">Gender *</label>
+              <select id="land-reg-gender" class="split-input" required style="padding-left: 0.9rem;">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="input-field-wrap">
+              <label for="land-reg-emergency">Parent / Emergency Contact *</label>
+              <input type="text" id="land-reg-emergency" class="split-input" placeholder="Full Name & Phone Number"
+                required style="padding-left: 0.9rem;">
+            </div>
+
+            <div class="input-field-wrap">
+              <label for="land-reg-needs">Room Accommodation Preferences *</label>
+              <textarea id="land-reg-needs" class="split-input"
+                placeholder="Describe room preferences (AC, quiet area, ground floor, etc)..." required
+                style="padding-left: 0.9rem; min-height: 70px;"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="split-submit-btn"
+            style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 1rem;">
+            <i class="fa-solid fa-user-plus"></i> Submit Registration & Create Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       AUTHENTICATED DASHBOARD WRAPPER
+       ========================================================================= -->
+  <div id="dashboard-wrapper" class="app-container" style="display: none;">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand-logo">
+        <i class="fa-solid fa-building-user"></i>
+        <div>
+          <h1>HostelHub</h1>
+          <span class="brand-tag">Management Portal</span>
+        </div>
+      </div>
+
+      <!-- Active Persona Card -->
+      <div class="active-role-card" id="active-role-card">
+        <div class="role-avatar" id="role-avatar-icon">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="role-info">
+          <span class="role-title" id="role-title-text">System Admin</span>
+          <span class="role-subtitle" id="role-subtitle-text">Full Control</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links Container -->
+      <ul class="nav-menu" id="sidebar-nav-menu">
+        <!-- Rendered dynamically by app.js -->
+      </ul>
+
+      <!-- Sidebar Footer Tools -->
+      <div class="sidebar-footer">
+        <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="app.toggleTheme()">
+          <span><i class="fa-solid fa-moon"></i> Theme Mode</span>
+          <i class="fa-solid fa-circle-half-stroke"></i>
+        </button>
+        <button class="btn btn-secondary btn-sm" id="logout-btn" onclick="app.logoutUser()"
+          style="width: 100%; justify-content: center;">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout to Home Page
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="app.syncDatabase()"
+          style="width: 100%; justify-content: center; font-size: 0.72rem;">
+          <i class="fa-solid fa-arrows-rotate"></i> Sync Database Records
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <main class="main-wrapper">
+
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="page-title-box">
+          <h2 id="header-page-title">Dashboard Overview</h2>
+          <p id="header-page-subtitle">Real-time hostel analytics and occupancy monitoring</p>
+        </div>
+
+        <div class="top-header-actions">
+          <!-- Active Logged-In User Badge & Profile Info -->
+          <div class="user-header-profile" id="user-header-profile">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+
+          <button class="btn btn-secondary btn-sm header-logout-btn" onclick="app.handleLogout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Area Body -->
+      <div class="content-body">
+
+        <!-- =========================================================================
+             ADMIN VIEWS
+             ========================================================================= -->
+
+        <!-- 1. Admin Overview -->
+        <section id="admin-overview-view" class="view-section active">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-chart-line"></i> Admin Operations & Control Hub</h2>
+              <p>Overall monitoring of students, wardens, room occupancy, leave requests, complaint tickets, and hostel
+                rules.</p>
+            </div>
+            <div class="banner-actions">
+              <button class="btn btn-primary" onclick="app.switchView('admin-rooms-view')">
+                <i class="fa-solid fa-bed"></i> Room Occupancy Grid
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="admin-stats-grid">
+            <!-- Rendered by app.js -->
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;" class="admin-grid-wrap">
+            <!-- Room Occupancy Summary -->
+            <div class="card">
+              <div class="modal-header"
+                style="padding: 0 0 1rem 0; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem;">
+                <h3><i class="fa-solid fa-door-open"></i> Quick Room Status Summary</h3>
+                <button class="btn btn-secondary btn-sm" onclick="app.switchView('admin-rooms-view')">View All
+                  Rooms</button>
+              </div>
+              <div class="room-grid" id="admin-quick-rooms-grid">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Recent Activity & Audit Logs -->
+            <div class="card" style="display: flex; flex-direction: column; gap: 1rem;">
+              <h3><i class="fa-solid fa-list-check"></i> Campus Audit Stream</h3>
+              <div id="admin-audit-list">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Admin Rooms View -->
+        <section id="admin-rooms-view" class="view-section">
+          <div class="filter-bar card" style="margin-bottom: 1.5rem;">
+            <div>
+              <h3><i class="fa-solid fa-bed"></i> Room Management & Occupancy Grid</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">View remaining vs booked rooms, or add new rooms.
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn btn-primary btn-sm" onclick="app.openModal('add-room-modal')">
+                <i class="fa-solid fa-plus"></i> Add New Room
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-bar card" style="margin-bottom: 1.5rem;">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="admin-room-search" placeholder="Search room number, block, or student..."
+                onkeyup="app.renderAdminRooms()">
+            </div>
+            <div class="filter-group">
+              <select id="admin-room-block-filter" class="select-input" onchange="app.renderAdminRooms()">
+                <option value="all">All Blocks</option>
+                <option value="Block A">Block A</option>
+                <option value="Block B">Block B</option>
+                <option value="Block C">Block C</option>
+              </select>
+              <select id="admin-room-status-filter" class="select-input" onchange="app.renderAdminRooms()">
+                <option value="all">All Statuses</option>
+                <option value="booked">Booked Rooms</option>
+                <option value="remaining">Remaining / Vacant</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="room-grid" id="admin-all-rooms-grid">
+            <!-- Rendered by app.js -->
+          </div>
+        </section>
+
+        <!-- 3. Admin Students View -->
+        <section id="admin-students-view" class="view-section">
+          <div class="filter-bar card">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="admin-student-search" placeholder="Search by name, email, department, or room..."
+                onkeyup="app.renderAdminStudents()">
+            </div>
+            <div class="filter-group">
+              <select id="admin-student-filter" class="select-input" onchange="app.renderAdminStudents()">
+                <option value="all">All Allocation Status</option>
+                <option value="Allocated">Allocated</option>
+                <option value="Pending Allocation">Pending Allocation</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Student Details</th>
+                    <th>Dept & Year</th>
+                    <th>Assigned Room</th>
+                    <th>Stated Needs / Preferences</th>
+                    <th>Emergency Contact</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-students-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Admin Wardens View -->
+        <section id="admin-wardens-view" class="view-section">
+          <div class="filter-bar card">
+            <h3><i class="fa-solid fa-user-shield"></i> Warden Officers Directory</h3>
+            <button class="btn btn-primary" onclick="app.openModal('add-warden-modal')">
+              <i class="fa-solid fa-plus"></i> Add Warden Officer
+            </button>
+          </div>
+
+          <div class="room-grid" id="admin-wardens-grid">
+            <!-- Rendered dynamically -->
+          </div>
+        </section>
+
+        <!-- 5. Admin Rules Management View -->
+        <section id="admin-rules-view" class="view-section">
+          <div class="filter-bar card">
+            <div>
+              <h3><i class="fa-solid fa-scale-balanced"></i> Hostel Rules & Policy Manager</h3>
+              <p style="font-size: 0.82rem; color: var(--text-muted);">Create and toggle rules visible on student &
+                warden portals and homepage.</p>
+            </div>
+            <button class="btn btn-primary" onclick="app.openModal('add-rule-modal')">
+              <i class="fa-solid fa-plus"></i> Create New Rule
+            </button>
+          </div>
+
+          <div class="rules-container" id="admin-rules-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </section>
+
+        <!-- 6. Admin Gate & Attendance Log View -->
+        <section id="admin-gate-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-qrcode"></i> Campus Gate Entry & Exit Audit Stream</h2>
+              <p>Real-time tracking of student entries and exits verified against live MySQL attendance records.</p>
+            </div>
+            <div class="banner-actions">
+              <button class="btn btn-secondary" onclick="app.copyQRToken('admin-qr-token-text')">
+                <i class="fa-solid fa-copy"></i> Copy Hostel QR Token
+              </button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;" class="admin-grid-wrap">
+            <div class="card">
+              <div class="filter-bar" style="padding: 0; margin-bottom: 1rem; border: none; background: transparent;">
+                <div class="search-box" style="flex: 1;">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input type="text" id="admin-gate-search" placeholder="Search student name or ID..." onkeyup="app.renderAdminGateView()">
+                </div>
+                <div class="filter-group">
+                  <select id="admin-gate-type-filter" class="select-input" onchange="app.renderAdminGateView()">
+                    <option value="all">All Movements</option>
+                    <option value="IN">Gate IN</option>
+                    <option value="OUT">Gate OUT</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Room</th>
+                      <th>Movement</th>
+                      <th>Timestamp</th>
+                      <th>Audit Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-gate-table-body">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card" style="text-align: center;">
+              <h3><i class="fa-solid fa-qrcode"></i> Official Hostel Gate QR</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Students scan this code at security checkpoints to record gate entry & exit.</p>
+              <div style="background: white; padding: 1rem; border-radius: var(--radius-md); display: inline-block; margin-bottom: 1rem;">
+                <img id="admin-qr-image" alt="Hostel Common Gate QR" style="width: 180px; height: 180px; display: block;" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=HOSTEL-HUB-COMMON-GATE-QR-2026">
+              </div>
+              <div style="font-size: 0.8rem; word-break: break-all; color: var(--primary); font-weight: 600;" id="admin-qr-token-text">HOSTEL-HUB-COMMON-GATE-QR-2026</div>
+            </div>
+          </div>
+        </section>
+        <!-- =========================================================================
+             WARDEN VIEWS
+             ========================================================================= -->
+
+        <!-- 1. Warden Leave Request Approvals -->
+        <section id="warden-leave-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-envelope-open-text"></i> Student Leave Request Letter Approvals</h2>
+              <p>Review leave letters submitted by students. Approve or reject leave with warden notes.</p>
+            </div>
+          </div>
+
+          <div class="filter-bar card">
+            <div class="filter-group">
+              <select id="warden-leave-filter" class="select-input" onchange="app.renderWardenLeave()">
+                <option value="all">All Request Statuses</option>
+                <option value="Pending" selected>Pending Review</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Student & Room</th>
+                    <th>Leave Type</th>
+                    <th>Dates</th>
+                    <th>Reason</th>
+                    <th>Parent Contact</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="warden-leave-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Warden Complaint Rectification Desk -->
+        <section id="warden-complaints-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-screwdriver-wrench"></i> Issue & Complaint Rectification Desk</h2>
+              <p>Track student complaints, update resolution progress (Pending $\rightarrow$ In Progress $\rightarrow$
+                Resolved), and issue work remarks.</p>
+            </div>
+          </div>
+
+          <div class="filter-bar card">
+            <div class="filter-group">
+              <select id="warden-complaint-filter" class="select-input" onchange="app.renderWardenComplaints()">
+                <option value="all">All Priorities & Statuses</option>
+                <option value="Pending">Pending Complaints</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Ticket ID</th>
+                    <th>Student & Room</th>
+                    <th>Category</th>
+                    <th>Issue Description</th>
+                    <th>Priority</th>
+                    <th>Current Status</th>
+                    <th>Remarks</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="warden-complaints-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Warden Room Allocation Desk -->
+        <section id="warden-allocation-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-key"></i> Smart Room Allocation Engine</h2>
+              <p>Review student registration data and submitted needs to allocate remaining vacant rooms.</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;" class="allocation-grid-wrap">
+
+            <!-- Students Awaiting Allocation -->
+            <div class="card">
+              <h3><i class="fa-solid fa-user-clock"></i> Students Needing Allocation</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Click on a student to match
+                with a remaining room based on their needs.</p>
+              <div id="warden-unallocated-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Available / Remaining Rooms Grid -->
+            <div class="card">
+              <h3><i class="fa-solid fa-bed"></i> Remaining / Vacant Rooms</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Rooms ready for instant
+                student assignment.</p>
+              <div class="room-grid" id="warden-remaining-rooms-grid" style="grid-template-columns: 1fr 1fr;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 4. Warden Attendance & Gate Pass Log View -->
+        <section id="warden-gate-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-door-open"></i> Block Student Attendance & Gate Logs</h2>
+              <p>Monitor real-time entry and exit movements of students residing in your assigned block.</p>
+            </div>
+            <div class="banner-actions">
+              <button class="btn btn-primary" onclick="app.renderWardenGateView()">
+                <i class="fa-solid fa-rotate"></i> Refresh Logs
+              </button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 1.5rem;" class="admin-grid-wrap">
+            <div class="card">
+              <div class="filter-bar" style="padding: 0; margin-bottom: 1rem; border: none; background: transparent;">
+                <div class="search-box" style="flex: 1;">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input type="text" id="warden-gate-search" placeholder="Search student name or ID..." onkeyup="app.renderWardenGateView()">
+                </div>
+                <div class="filter-group">
+                  <select id="warden-gate-type-filter" class="select-input" onchange="app.renderWardenGateView()">
+                    <option value="all">All Movements</option>
+                    <option value="IN">Gate IN</option>
+                    <option value="OUT">Gate OUT</option>
+                  </select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Room</th>
+                      <th>Movement</th>
+                      <th>Timestamp</th>
+                      <th>Verified Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="warden-gate-table-body">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card" style="text-align: center;">
+              <h3><i class="fa-solid fa-qrcode"></i> Block Gate QR Code</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Displayed at warden check-post for student attendance check-ins.</p>
+              <div style="background: white; padding: 1rem; border-radius: var(--radius-md); display: inline-block; margin-bottom: 1rem;">
+                <img id="warden-qr-image" alt="Warden Gate QR" style="width: 180px; height: 180px; display: block;" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=HOSTEL-HUB-COMMON-GATE-QR-2026">
+              </div>
+              <div style="font-size: 0.8rem; word-break: break-all; color: var(--primary); font-weight: 600;" id="warden-qr-token-text">HOSTEL-HUB-COMMON-GATE-QR-2026</div>
+            </div>
+          </div>
+        </section>        <!-- =========================================================================
+             STUDENT VIEWS
+             ========================================================================= -->
+
+        <!-- 1. Student Registration & Needs Form -->
+        <section id="student-register-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-address-card"></i> Student Hostel Registration & Needs Form</h2>
+              <p>Register or update your personal details, emergency contacts, and room accommodation needs.</p>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 800px; margin: 0 auto;">
+            <form id="student-registration-form" onsubmit="app.handleStudentRegister(event)">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="reg-name"><i class="fa-solid fa-user"></i> Full Name *</label>
+                  <input type="text" id="reg-name" class="form-control" required placeholder="e.g. Alex Morgan">
+                </div>
+
+                <div class="form-group">
+                  <label for="reg-email"><i class="fa-solid fa-envelope"></i> Email Address *</label>
+                  <input type="email" id="reg-email" class="form-control" required placeholder="alex@student.edu">
+                </div>
+
+                <div class="form-group">
+                  <label for="reg-phone"><i class="fa-solid fa-phone"></i> Contact Phone *</label>
+                  <input type="tel" id="reg-phone" class="form-control" required placeholder="+1 (555) 000-0000">
+                </div>
+
+                <div class="form-group">
+                  <label for="reg-dept"><i class="fa-solid fa-graduation-cap"></i> Department *</label>
+                  <input type="text" id="reg-dept" class="form-control" required placeholder="e.g. Computer Science">
+                </div>
+
+                <div class="form-group">
+                  <label for="reg-year"><i class="fa-solid fa-calendar"></i> Academic Year *</label>
+                  <select id="reg-year" class="form-control" required>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="reg-gender"><i class="fa-solid fa-venus-mars"></i> Gender *</label>
+                  <select id="reg-gender" class="form-control" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-group full-width">
+                  <label for="reg-emergency"><i class="fa-solid fa-phone-volume"></i> Parent / Emergency Contact Details
+                    *</label>
+                  <input type="text" id="reg-emergency" class="form-control" required
+                    placeholder="Full Name & Phone Number (e.g. John Doe - +1 555 999 8877)">
+                </div>
+
+                <div class="form-group full-width">
+                  <label for="reg-needs"><i class="fa-solid fa-heart-pulse"></i> Specific Room Needs & Preferences
+                    *</label>
+                  <textarea id="reg-needs" class="form-control" required
+                    placeholder="Describe your room preferences (e.g., AC requirement, Single/Sharing preference, quiet study area, ground floor request)..."></textarea>
+                </div>
+              </div>
+
+              <div style="margin-top: 1.5rem; text-align: right;">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-paper-plane"></i> Submit Registration & Preferences
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- 2. Student Room Status View -->
+        <section id="student-room-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-bed"></i> My Room Status & Accommodation Details</h2>
+              <p>View your current room allocation details, assigned block, and roommate information.</p>
+            </div>
+          </div>
+
+          <div id="student-room-details-card">
+            <!-- Rendered dynamically -->
+          </div>
+        </section>
+
+        <!-- 3. Student Raise Complaint View -->
+        <section id="student-complaint-view" class="view-section">
+          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem;" class="complaint-grid-wrap">
+
+            <!-- Raise Form -->
+            <div class="card">
+              <h3><i class="fa-solid fa-triangle-exclamation"></i> Raise Maintenance Complaint</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem;">Log facility or room
+                issues for warden resolution.</p>
+
+              <form id="raise-complaint-form" onsubmit="app.handleRaiseComplaint(event)">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                  <label for="cmp-category">Category *</label>
+                  <select id="cmp-category" class="form-control" required>
+                    <option value="Plumbing">Plumbing / Water Leak</option>
+                    <option value="Electrical">Electrical / Fan / Light</option>
+                    <option value="Wi-Fi / Internet">Wi-Fi & Network</option>
+                    <option value="Furniture / Woodwork">Furniture / Locks</option>
+                    <option value="Cleanliness & Hygiene">Cleanliness & Hygiene</option>
+                    <option value="Mess / Food Quality">Mess & Food</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                  <label for="cmp-priority">Priority Level *</label>
+                  <select id="cmp-priority" class="form-control" required>
+                    <option value="Low">Low Priority</option>
+                    <option value="Medium" selected>Medium Priority</option>
+                    <option value="High">High / Urgent Priority</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                  <label for="cmp-description">Issue Description *</label>
+                  <textarea id="cmp-description" class="form-control" required
+                    placeholder="Provide clear details of the issue in your room..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                  <i class="fa-solid fa-paper-plane"></i> Submit Ticket
+                </button>
+              </form>
+            </div>
+
+            <!-- Complaint Tracking History -->
+            <div class="card">
+              <h3><i class="fa-solid fa-clock-rotate-left"></i> My Complaint History</h3>
+              <div id="student-complaint-history" style="margin-top: 1rem;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 4. Student Leave / Request Letter View -->
+        <section id="student-leave-view" class="view-section">
+          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem;" class="leave-grid-wrap">
+
+            <!-- Leave Application Form -->
+            <div class="card">
+              <h3><i class="fa-solid fa-envelope"></i> Submit Leave Request Letter</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem;">Submit leave for warden
+                authorization.</p>
+
+              <form id="student-leave-form" onsubmit="app.handleStudentLeave(event)">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                  <label for="leave-type">Leave Category *</label>
+                  <select id="leave-type" class="form-control" required>
+                    <option value="Home Leave">Home Leave</option>
+                    <option value="Weekend Outing">Weekend Outing</option>
+                    <option value="Medical Leave">Medical Emergency Leave</option>
+                    <option value="Academic Permission">Academic Project / Off-campus</option>
+                  </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                  <div class="form-group">
+                    <label for="leave-start">Start Date *</label>
+                    <input type="date" id="leave-start" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="leave-end">End Date *</label>
+                    <input type="date" id="leave-end" class="form-control" required>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                  <label for="leave-parent">Parent/Guardian Contact *</label>
+                  <input type="tel" id="leave-parent" class="form-control" required placeholder="+1 (555) 000-0000">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                  <label for="leave-reason">Detailed Reason *</label>
+                  <textarea id="leave-reason" class="form-control" required
+                    placeholder="State your exact reason for leave..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                  <i class="fa-solid fa-paper-plane"></i> Send Request Letter
+                </button>
+              </form>
+            </div>
+
+            <!-- Leave Request History Table -->
+            <div class="card">
+              <h3><i class="fa-solid fa-history"></i> My Request Letters History</h3>
+              <div id="student-leave-history" style="margin-top: 1rem;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 5. Student Rules View -->
+        <section id="student-rules-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-book-bookmark"></i> Hostel Rules, Regulations & Code of Conduct</h2>
+              <p>Stay informed about curfew timings, guest protocols, mess rules, and campus discipline guidelines.</p>
+            </div>
+          </div>
+
+          <div class="filter-bar card">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="student-rule-search" placeholder="Search rules by title or keyword..."
+                onkeyup="app.renderStudentRules()">
+            </div>
+          </div>
+
+          <div class="rules-container" id="student-rules-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </section>
+
+        <!-- 6. Student Gate Pass & Attendance View -->
+        <section id="student-gate-view" class="view-section">
+          <div class="banner-card card">
+            <div class="banner-content">
+              <h2><i class="fa-solid fa-id-badge"></i> Digital Gate Pass & Attendance Check-In</h2>
+              <p>Scan the hostel gate QR code upon entry and exit to maintain your automated attendance log.</p>
+            </div>
+            <div class="banner-actions">
+              <button class="btn btn-primary" onclick="app.simulateGateScan()">
+                <i class="fa-solid fa-qrcode"></i> Scan Hostel Gate QR
+              </button>
+            </div>
+          </div>
+
+          <div id="student-scan-result-banner" style="display: none; margin-bottom: 1.5rem; padding: 1rem; border-radius: var(--radius-md);"></div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem;" class="leave-grid-wrap">
+            <div class="card">
+              <h3><i class="fa-solid fa-camera"></i> QR Pass Verification</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Confirm entry or exit with security token.</p>
+              
+              <div style="background: var(--bg-primary); padding: 1.25rem; border-radius: var(--radius-md); text-align: center; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-shield-halved" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 0.75rem;"></i>
+                <h4 style="margin-bottom: 0.5rem;">Automated Notification Active</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Every verified scan instantly records timestamp in MySQL and notifies your block warden.</p>
+              </div>
+
+              <button class="btn btn-success" onclick="app.simulateGateScan()" style="width: 100%; justify-content: center; padding: 0.85rem;">
+                <i class="fa-solid fa-fingerprint"></i> Record IN / OUT Gate Scan
+              </button>
+            </div>
+
+            <div class="card">
+              <h3><i class="fa-solid fa-clock-rotate-left"></i> My Gate Movement & Attendance History</h3>
+              <div class="table-responsive" style="margin-top: 1rem;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Action</th>
+                      <th>Date & Time</th>
+                      <th>Room</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="student-gate-table-body">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- Standard Login Modal -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-right-to-bracket"></i> Account Login Portal</h3>
+        <button class="close-modal" onclick="app.closeModal('login-modal')">&times;</button>
+      </div>
+      <form onsubmit="app.handleFormLogin(event)">
+        <div class="modal-body form-grid">
+          <div class="form-group full-width">
+            <label for="login-role">Select Login Role *</label>
+            <select id="login-role" class="form-control" required>
+              <option value="admin">Admin Officer</option>
+              <option value="warden">Warden Officer</option>
+              <option value="student">Student Resident</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="login-email">Email Address *</label>
+            <input type="email" id="login-email" class="form-control" required placeholder="e.g. admin@hms.edu">
+          </div>
+          <div class="form-group full-width">
+            <label for="login-password">Password *</label>
+            <input type="password" id="login-password" class="form-control" required placeholder="••••••••">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('login-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-key"></i> Log In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Room Modal -->
+  <div class="modal-overlay" id="add-room-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-plus-circle"></i> Add New Hostel Room</h3>
+        <button class="close-modal" onclick="app.closeModal('add-room-modal')">&times;</button>
+      </div>
+      <form onsubmit="app.handleAddRoom(event)">
+        <div class="modal-body form-grid">
+          <div class="form-group">
+            <label for="room-block">Block *</label>
+            <select id="room-block" class="form-control" required>
+              <option value="Block A">Block A</option>
+              <option value="Block B">Block B</option>
+              <option value="Block C">Block C</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="room-number">Room Number *</label>
+            <input type="text" id="room-number" class="form-control" required placeholder="e.g. 302">
+          </div>
+          <div class="form-group">
+            <label for="room-floor">Floor Level *</label>
+            <input type="number" id="room-floor" class="form-control" required min="1" max="5" value="1">
+          </div>
+          <div class="form-group">
+            <label for="room-type">Room Category *</label>
+            <select id="room-type" class="form-control" required>
+              <option value="Double AC">Double AC</option>
+              <option value="Double Non-AC">Double Non-AC</option>
+              <option value="Single AC">Single AC</option>
+              <option value="Single Deluxe">Single Deluxe</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="room-capacity">Occupancy Capacity *</label>
+            <input type="number" id="room-capacity" class="form-control" required min="1" max="4" value="2">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('add-room-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Room</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Professional Portal Login Modal -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-card login-modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-lock"></i> Portal Authentication & Login</h3>
+        <button class="close-modal" onclick="app.closeModal('login-modal')">&times;</button>
+      </div>
+
+      <div class="login-modal-tabs">
+        <button type="button" class="modal-tab-btn active" id="modal-tab-admin"
+          onclick="app.switchLoginModalTab('admin')">
+          <i class="fa-solid fa-user-shield"></i> Admin
+        </button>
+        <button type="button" class="modal-tab-btn" id="modal-tab-warden" onclick="app.switchLoginModalTab('warden')">
+          <i class="fa-solid fa-user-nurse"></i> Warden
+        </button>
+        <button type="button" class="modal-tab-btn" id="modal-tab-student" onclick="app.switchLoginModalTab('student')">
+          <i class="fa-solid fa-user-graduate"></i> Student
+        </button>
+      </div>
+
+      <form id="portal-login-form" onsubmit="app.handlePortalLogin(event)">
+        <input type="hidden" id="login-active-role" value="admin">
+
+        <div class="modal-body form-grid">
+          <!-- Alert for error messaging -->
+          <div id="login-error-alert" class="login-alert-danger" style="display: none; grid-column: span 2;">
+            <i class="fa-solid fa-triangle-exclamation"></i> <span id="login-error-msg">Invalid credentials.</span>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="login-identifier" id="login-identifier-label"><i class="fa-solid fa-envelope"></i> Admin
+              Username / Email *</label>
+            <input type="text" id="login-identifier" class="form-control" required placeholder="Enter email or ID...">
+          </div>
+
+          <div class="form-group full-width">
+            <label for="login-password"><i class="fa-solid fa-key"></i> Passcode / Password *</label>
+            <div class="password-input-wrap">
+              <input type="password" id="login-password" class="form-control" required placeholder="Enter password...">
+              <button type="button" class="toggle-password-btn" onclick="app.togglePasswordVisibility()">
+                <i class="fa-solid fa-eye" id="password-eye-icon"></i>
+              </button>
+            </div>
+          </div>
+
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('login-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-right-to-bracket"></i> Login & Access Features
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Warden Modal -->
+  <div class="modal-overlay" id="add-warden-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus"></i> Register New Warden Officer</h3>
+        <button class="close-modal" onclick="app.closeModal('add-warden-modal')">&times;</button>
+      </div>
+      <form onsubmit="app.handleAddWarden(event)">
+        <div class="modal-body form-grid">
+          <div class="form-group">
+            <label for="wrd-name">Warden Full Name *</label>
+            <input type="text" id="wrd-name" class="form-control" required placeholder="e.g. Dr. Arthur Pendelton">
+          </div>
+          <div class="form-group">
+            <label for="wrd-block">Assigned Hostel Block *</label>
+            <select id="wrd-block" class="form-control" required>
+              <option value="Block A">Block A</option>
+              <option value="Block B">Block B</option>
+              <option value="Block C">Block C</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="wrd-email">Email *</label>
+            <input type="email" id="wrd-email" class="form-control" required placeholder="warden@hms.edu">
+          </div>
+          <div class="form-group">
+            <label for="wrd-phone">Phone *</label>
+            <input type="tel" id="wrd-phone" class="form-control" required placeholder="+1 (555) 000-0000">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('add-warden-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Warden</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Rule Modal -->
+  <div class="modal-overlay" id="add-rule-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-plus-circle"></i> Create Hostel Policy Rule</h3>
+        <button class="close-modal" onclick="app.closeModal('add-rule-modal')">&times;</button>
+      </div>
+      <form onsubmit="app.handleAddRule(event)">
+        <div class="modal-body form-grid">
+          <div class="form-group">
+            <label for="rule-title">Rule Title *</label>
+            <input type="text" id="rule-title" class="form-control" required placeholder="e.g. Mess Hygiene Code">
+          </div>
+          <div class="form-group">
+            <label for="rule-category">Category *</label>
+            <select id="rule-category" class="form-control" required>
+              <option value="Timings">Timings</option>
+              <option value="Security">Security</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Dining">Dining</option>
+              <option value="General Discipline">General Discipline</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="rule-description">Rule Description *</label>
+            <textarea id="rule-description" class="form-control" required
+              placeholder="Detailed policy description..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('add-rule-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Rule</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Warden Leave Approval Action Modal -->
+  <div class="modal-overlay" id="warden-leave-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-signature"></i> Process Leave Request</h3>
+        <button class="close-modal" onclick="app.closeModal('warden-leave-modal')">&times;</button>
+      </div>
+      <form onsubmit="app.handleProcessLeave(event)">
+        <input type="hidden" id="leave-action-id">
+        <div class="modal-body form-grid">
+          <div class="form-group full-width" id="leave-modal-details"
+            style="font-size: 0.88rem; color: var(--text-muted);">
+            <!-- Rendered dynamically -->
+          </div>
+          <div class="form-group full-width">
+            <label for="leave-action-status">Decision *</label>
+            <select id="leave-action-status" class="form-control" required>
+              <option value="Approved">Approve Leave</option>
+              <option value="Rejected">Reject Leave</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="leave-action-notes">Warden Remarks *</label>
+            <textarea id="leave-action-notes" class="form-control" required
+              placeholder="Enter remarks or approval conditions..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('warden-leave-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Decision</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Warden Complaint Rectify Action Modal -->
+  <div class="modal-overlay" id="warden-complaint-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-wrench"></i> Update Complaint Ticket</h3>
+        <button class="close-modal" onclick="app.closeModal('warden-complaint-modal')">&times;</button>
+      </div>
+      <form onsubmit="app.handleProcessComplaint(event)">
+        <input type="hidden" id="cmp-action-id">
+        <div class="modal-body form-grid">
+          <div class="form-group full-width" id="cmp-modal-details"
+            style="font-size: 0.88rem; color: var(--text-muted);">
+            <!-- Rendered dynamically -->
+          </div>
+          <div class="form-group full-width">
+            <label for="cmp-action-status">Status Progress *</label>
+            <select id="cmp-action-status" class="form-control" required>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress (Staff Assigned)</option>
+              <option value="Resolved">Resolved & Rectified</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="cmp-action-remarks">Warden / Technician Remarks *</label>
+            <textarea id="cmp-action-remarks" class="form-control" required
+              placeholder="Detail the resolution steps taken..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+            onclick="app.closeModal('warden-complaint-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Rectification</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Room Allocation Modal -->
+  <div class="modal-overlay" id="allocate-room-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bed"></i> Allocate Remaining Vacant Room</h3>
+        <button class="close-modal" onclick="app.closeModal('allocate-room-modal')">&times;</button>
+      </div>
+      <form onsubmit="app.handleConfirmAllocation(event)">
+        <input type="hidden" id="alloc-student-id">
+        <div class="modal-body form-grid">
+          <div class="form-group full-width" id="alloc-modal-student-info">
+            <!-- Student details rendered dynamically -->
+          </div>
+          <div class="form-group full-width">
+            <label for="alloc-room-select">Select Remaining / Vacant Room *</label>
+            <select id="alloc-room-select" class="form-control" required>
+              <!-- Remaining rooms list -->
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary"
+            onclick="app.closeModal('allocate-room-modal')">Cancel</button>
+          <button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Confirm Allocation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/api.js"></script>
+  <script src="js/mockData.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
