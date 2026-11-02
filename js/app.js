@@ -193,10 +193,24 @@ class AppController {
       if (passInput) passInput.value = '';
     }
 
-    // Auto-fetch student credentials if available
+    // Auto-fetch credentials if available
     if (role === 'student' && userInput && (!userInput.value || prevRole !== role)) {
       const savedEmail = localStorage.getItem('hms_last_student_email') || '';
-      const savedPass = sessionStorage.getItem('hms_last_student_pass') || '';
+      const savedPass = sessionStorage.getItem('hms_last_student_pass') || localStorage.getItem('hms_last_student_pass') || '';
+      if (savedEmail) {
+        userInput.value = savedEmail;
+        if (passInput && savedPass) passInput.value = savedPass;
+      }
+    } else if (role === 'warden' && userInput && (!userInput.value || prevRole !== role)) {
+      const savedEmail = localStorage.getItem('hms_last_warden_email') || 'priya123@gamil.com';
+      const savedPass = sessionStorage.getItem('hms_last_warden_pass') || localStorage.getItem('hms_last_warden_pass') || 'priya123';
+      if (savedEmail) {
+        userInput.value = savedEmail;
+        if (passInput && savedPass) passInput.value = savedPass;
+      }
+    } else if (role === 'admin' && userInput && (!userInput.value || prevRole !== role)) {
+      const savedEmail = localStorage.getItem('hms_last_admin_email') || 'admin123@gmail.com';
+      const savedPass = sessionStorage.getItem('hms_last_admin_pass') || localStorage.getItem('hms_last_admin_pass') || 'admin123';
       if (savedEmail) {
         userInput.value = savedEmail;
         if (passInput && savedPass) passInput.value = savedPass;
@@ -205,7 +219,7 @@ class AppController {
 
     if (userInput) {
       if (role === 'admin') userInput.placeholder = 'e.g. admin123@gmail.com';
-      else if (role === 'warden') userInput.placeholder = 'e.g. WRD-205 or email';
+      else if (role === 'warden') userInput.placeholder = 'e.g. priya123@gamil.com or WRD-207';
       else userInput.placeholder = 'e.g. STU-1011 or email';
     }
 
@@ -213,7 +227,7 @@ class AppController {
       if (role === 'admin') {
         hintText.innerHTML = `<span>Sign in with Administrator credentials (admin123@gmail.com)</span>`;
       } else if (role === 'warden') {
-        hintText.innerHTML = `<span>Sign in with Warden ID or assigned email</span>`;
+        hintText.innerHTML = `<span>Sign in with Warden ID or assigned email (e.g. priya123@gamil.com)</span>`;
       } else {
         hintText.innerHTML = `<span>Sign in with Student ID or registered email</span>`;
       }
@@ -613,6 +627,10 @@ class AppController {
     this.showHomeLayout();
     if (role === 'student') {
       this.setLoginTab('student');
+    } else if (role === 'warden') {
+      this.setLoginTab('warden');
+    } else if (role === 'admin') {
+      this.setLoginTab('admin');
     }
   }
 
@@ -636,13 +654,20 @@ class AppController {
       return;
     }
 
-    const roleBadgeClass = user.role === 'admin' ? 'Admin' : user.role === 'warden' ? `Warden (${user.block || 'Staff'})` : `Student (${user.id})`;
+    const currentWarden = store.getCurrentWarden();
+    const displayName = (user.role === 'warden' && currentWarden && currentWarden.name) ? currentWarden.name : user.name;
+    const wardenBlock = (currentWarden && currentWarden.block) ? currentWarden.block : (user.block || 'Block C');
+    const roleBadgeClass = user.role === 'admin' 
+      ? 'Admin' 
+      : user.role === 'warden' 
+        ? `Warden (${wardenBlock})` 
+        : `Student (${user.id})`;
     const avatarIcon = user.role === 'admin' ? 'fa-user-shield' : user.role === 'warden' ? 'fa-user-nurse' : 'fa-user-graduate';
 
     container.innerHTML = `
       <div class="user-profile-avatar"><i class="fa-solid ${avatarIcon}"></i></div>
       <div class="user-profile-info">
-        <span class="user-profile-name">${user.name}</span>
+        <span class="user-profile-name">${displayName}</span>
         <span class="user-profile-role">${roleBadgeClass}</span>
       </div>
     `;
@@ -670,8 +695,7 @@ class AppController {
         { id: 'admin-rooms-view', label: 'Room Management', icon: 'fa-bed' },
         { id: 'admin-students-view', label: 'Student Directory', icon: 'fa-users' },
         { id: 'admin-wardens-view', label: 'Warden Officers', icon: 'fa-user-nurse' },
-        { id: 'admin-rules-view', label: 'Rules & Policy Manager', icon: 'fa-scale-balanced' },
-        { id: 'admin-gate-view', label: 'Gate & Attendance Logs', icon: 'fa-qrcode' }
+        { id: 'admin-rules-view', label: 'Rules & Policy Manager', icon: 'fa-scale-balanced' }
       ], 'admin-overview-view');
     } else if (role === 'warden') {
       roleTitle.innerText = 'Warden Officer';
@@ -683,7 +707,6 @@ class AppController {
         { id: 'warden-complaints-view', label: 'Issue Rectification', icon: 'fa-screwdriver-wrench' },
         { id: 'warden-allocation-view', label: 'Smart Room Allocation', icon: 'fa-key' },
         { id: 'admin-students-view', label: 'Student Directory', icon: 'fa-users' },
-        { id: 'warden-gate-view', label: 'Block Gate & Attendance', icon: 'fa-door-open' },
         { id: 'student-rules-view', label: 'Hostel Rules', icon: 'fa-book-bookmark' }
       ], 'warden-leave-view');
     } else if (role === 'student') {
@@ -698,7 +721,6 @@ class AppController {
         { id: 'student-register-view', label: 'Registration & Needs Form', icon: 'fa-address-card' },
         { id: 'student-complaint-view', label: 'Raise Complaint Ticket', icon: 'fa-triangle-exclamation' },
         { id: 'student-leave-view', label: 'Request Letter / Leave', icon: 'fa-paper-plane' },
-        { id: 'student-gate-view', label: 'Digital Gate Pass', icon: 'fa-id-badge' },
         { id: 'student-rules-view', label: 'Hostel Rules & Guide', icon: 'fa-book-bookmark' }
       ], 'student-room-view');
     }
@@ -733,9 +755,9 @@ class AppController {
 
     // Route Guard Definitions by Role
     const roleRoutes = {
-      admin: ['admin-overview-view', 'admin-rooms-view', 'admin-students-view', 'admin-wardens-view', 'admin-rules-view', 'admin-gate-view'],
-      warden: ['warden-leave-view', 'warden-complaints-view', 'warden-allocation-view', 'admin-students-view', 'student-rules-view', 'warden-gate-view'],
-      student: ['student-room-view', 'student-register-view', 'student-complaint-view', 'student-leave-view', 'student-rules-view', 'student-gate-view']
+      admin: ['admin-overview-view', 'admin-rooms-view', 'admin-students-view', 'admin-wardens-view', 'admin-rules-view'],
+      warden: ['warden-leave-view', 'warden-complaints-view', 'warden-allocation-view', 'admin-students-view', 'student-rules-view'],
+      student: ['student-room-view', 'student-register-view', 'student-complaint-view', 'student-leave-view', 'student-rules-view']
     };
 
     if (user && roleRoutes[user.role] && !roleRoutes[user.role].includes(viewId)) {
@@ -768,16 +790,13 @@ class AppController {
       'admin-students-view': ['Master Student Database', 'Resident student records and room status'],
       'admin-wardens-view': ['Warden Directory', 'Assigned hostel block wardens and contact details'],
       'admin-rules-view': ['Hostel Rules Manager', 'Configure code of conduct and student policies'],
-      'admin-gate-view': ['Gate & Attendance Audit', 'Real-time entry and exit logs and hostel security verification'],
       'warden-leave-view': ['Leave Request Approval Hub', 'Review student request letters and grant permissions'],
       'warden-complaints-view': ['Issue Rectification Desk', 'Manage and resolve reported student complaints'],
       'warden-allocation-view': ['Room Allocation Engine', 'Match unallocated student needs with remaining vacant rooms'],
-      'warden-gate-view': ['Block Gate & Attendance Stream', 'Monitor student entry/exit records for your assigned block'],
       'student-register-view': ['Student Registration & Needs Form', 'Submit personal information and room accommodation preferences'],
       'student-room-view': ['My Accommodation Details', 'Current room booking status and roommate profile'],
       'student-complaint-view': ['Raise Complaint Ticket', 'Report maintenance issues directly to warden staff'],
       'student-leave-view': ['Request Letter / Leave Application', 'Submit out-of-campus leave letters for warden approval'],
-      'student-gate-view': ['Digital Gate Pass & Scanner', 'Automated IN/OUT gate pass scanning and personal attendance log'],
       'student-rules-view': ['Hostel Rules & Regulations', 'Official residence guidelines and timing rules']
     };
 
@@ -806,9 +825,6 @@ class AppController {
       case 'admin-rules-view':
         this.renderAdminRules();
         break;
-      case 'admin-gate-view':
-        await this.renderAdminGateView();
-        break;
 
       case 'warden-leave-view':
         this.renderWardenLeave();
@@ -818,9 +834,6 @@ class AppController {
         break;
       case 'warden-allocation-view':
         this.renderWardenAllocation();
-        break;
-      case 'warden-gate-view':
-        await this.renderWardenGateView();
         break;
 
       case 'student-register-view':
@@ -834,9 +847,6 @@ class AppController {
         break;
       case 'student-leave-view':
         this.renderStudentLeaveTracker();
-        break;
-      case 'student-gate-view':
-        await this.renderStudentGateView();
         break;
       case 'student-rules-view':
         this.renderStudentRules();
@@ -1120,24 +1130,42 @@ class AppController {
     const grid = document.getElementById('admin-wardens-grid');
     if (!grid) return;
 
-    grid.innerHTML = wardens.map(w => `
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-          <div style="display: flex; gap: 0.85rem; align-items: center;">
-            <div class="role-avatar" style="width: 48px; height: 48px; font-size: 1.3rem;">
-              <i class="fa-solid fa-user-nurse"></i>
-            </div>
-            <div>
-              <h3 style="font-size: 1.1rem;">${w.name}</h3>
-              <span class="badge badge-ac">${w.block} Chief Warden</span>
-            </div>
-          </div>
-          <span class="badge badge-approved">${w.status || 'Active'}</span>
+    if (!wardens || wardens.length === 0) {
+      grid.innerHTML = `
+        <div class="card" style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 2.5rem;">
+          <i class="fa-solid fa-user-nurse" style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--text-muted); opacity: 0.5;"></i>
+          <h3>No Warden Officers Registered</h3>
+          <p style="font-size: 0.85rem; margin-top: 0.25rem;">Click "Add Warden Officer" above to assign an officer to a hostel block.</p>
         </div>
-        <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.4rem;">
-          <div><i class="fa-solid fa-id-badge"></i> Officer ID: ${w.id}</div>
-          <div><i class="fa-solid fa-envelope"></i> Email: ${w.email}</div>
-          <div><i class="fa-solid fa-phone"></i> Contact: ${w.phone}</div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = wardens.map(w => `
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <div style="display: flex; gap: 0.85rem; align-items: center;">
+              <div class="role-avatar" style="width: 48px; height: 48px; font-size: 1.3rem;">
+                <i class="fa-solid fa-user-nurse"></i>
+              </div>
+              <div>
+                <h3 style="font-size: 1.1rem;">${w.name}</h3>
+                <span class="badge badge-ac">${w.block} Chief Warden</span>
+              </div>
+            </div>
+            <span class="badge badge-approved">${w.status || 'Active'}</span>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.4rem;">
+            <div><i class="fa-solid fa-id-badge"></i> Officer ID: <strong>${w.id}</strong></div>
+            <div><i class="fa-solid fa-envelope"></i> Email: ${w.email}</div>
+            <div><i class="fa-solid fa-phone"></i> Contact: ${w.phone}</div>
+          </div>
+        </div>
+        <div style="margin-top: 1.25rem; padding-top: 0.85rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+          <button class="btn btn-danger btn-sm" onclick="app.removeWarden('${w.id}', '${w.name.replace(/'/g, "\\'")}')">
+            <i class="fa-solid fa-trash-can"></i> Remove Warden
+          </button>
         </div>
       </div>
     `).join('');
@@ -1188,6 +1216,25 @@ class AppController {
   // RENDER WARDEN VIEWS
   // =========================================================================
   renderWardenLeave() {
+    // Render Warden Officer Details Banner
+    const currentWarden = store.getCurrentWarden();
+    const currentUser = store.getCurrentUser();
+    const wName = (currentWarden && currentWarden.name) || (currentUser && currentUser.name) || 'Warden Officer';
+    const wBlock = (currentWarden && currentWarden.block) || (currentUser && currentUser.block) || 'Block C';
+    const wId = (currentWarden && currentWarden.id) || (currentUser && currentUser.id) || 'WRD-207';
+    const wEmail = (currentWarden && currentWarden.email) || (currentUser && currentUser.email) || '';
+    const wPhone = (currentWarden && currentWarden.phone) || (currentUser && currentUser.phone) || '';
+
+    const nameEl = document.getElementById('warden-dashboard-name');
+    const metaEl = document.getElementById('warden-dashboard-meta');
+    const blockBadge = document.getElementById('warden-dashboard-block-badge');
+    const idBadge = document.getElementById('warden-dashboard-id-badge');
+
+    if (nameEl) nameEl.innerText = `${wName} (Hostel Warden)`;
+    if (metaEl) metaEl.innerText = `Assigned Block: ${wBlock} | Email: ${wEmail}${wPhone ? ' | Phone: ' + wPhone : ''}`;
+    if (blockBadge) blockBadge.innerHTML = `<i class="fa-solid fa-building"></i> ${wBlock}`;
+    if (idBadge) idBadge.innerHTML = `<i class="fa-solid fa-id-badge"></i> ${wId}`;
+
     const filter = document.getElementById('warden-leave-filter')?.value || 'Pending';
     let requests = store.getLeaveRequests();
 
@@ -1872,6 +1919,20 @@ class AppController {
     }
   }
 
+  toggleWardenModalPassword() {
+    const input = document.getElementById('wrd-password');
+    const icon = document.getElementById('wrd-password-eye-icon');
+    if (!input || !icon) return;
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fa-solid fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fa-solid fa-eye';
+    }
+  }
+
   async handleAddWarden(event) {
     event.preventDefault();
     const modal = document.getElementById('add-warden-modal');
@@ -1882,11 +1943,13 @@ class AppController {
     const blockInput = document.getElementById('wrd-block');
     const emailInput = document.getElementById('wrd-email');
     const phoneInput = document.getElementById('wrd-phone');
+    const passwordInput = document.getElementById('wrd-password');
 
     const name = nameInput.value;
     const block = blockInput.value;
     const email = emailInput.value;
     const phone = phoneInput.value;
+    const password = passwordInput ? passwordInput.value : '';
 
     let hasError = false;
 
@@ -1902,22 +1965,54 @@ class AppController {
     const blockErr = Validator.validateRequired(block, "Hostel block assignment");
     if (blockErr) { this.showFieldError(blockInput, blockErr); hasError = true; }
 
+    const passErr = Validator.validatePassword(password);
+    if (passErr) { this.showFieldError(passwordInput, passErr); hasError = true; }
+
     if (hasError) {
       this.showToast("Please correct highlighted errors before submitting.", "danger");
       return;
     }
 
     const cleanPhone = phone.replace(/[\s-]/g, '');
-    const res = await store.addWarden({ name, block, email, phone: cleanPhone });
+    const cleanEmail = email.trim().toLowerCase();
+    const res = await store.addWarden({ name, block, email: cleanEmail, phone: cleanPhone, password });
     if (res && res.success !== false) {
+      localStorage.setItem('hms_last_warden_email', cleanEmail);
+      localStorage.setItem('hms_last_warden_pass', password);
+      sessionStorage.setItem('hms_last_warden_pass', password);
+      localStorage.setItem('hms_last_warden_name', name);
+      localStorage.setItem('hms_last_warden_block', block);
+
       this.closeModal('add-warden-modal');
-      this.showToast('New Warden Officer registered!', 'success');
+      this.showToast(`New Warden Officer ${name} registered successfully with custom password!`, 'success');
+      if (form) form.reset();
       this.renderAdminWardens();
     } else {
       this.showToast(res?.message || 'Failed to add warden officer', 'danger');
       if (res?.message && res.message.toLowerCase().includes('email')) {
         this.showFieldError(emailInput, res.message);
       }
+    }
+  }
+
+  async removeWarden(wardenId, wardenName) {
+    if (!confirm(`Are you sure you want to remove Warden Officer ${wardenName} (${wardenId})?\n\nThis will permanently delete their officer account and credentials from MySQL.`)) {
+      return;
+    }
+
+    try {
+      const res = await store.deleteWarden(wardenId);
+      if (res && res.success !== false) {
+        this.showToast(`Warden ${wardenName} (${wardenId}) was removed successfully.`, 'success');
+        await store.fetchWardens();
+        await store.fetchMetrics();
+        this.renderAdminWardens();
+        this.renderAdminOverview();
+      } else {
+        this.showToast(res?.message || 'Failed to remove warden officer', 'danger');
+      }
+    } catch (err) {
+      this.showToast(err.message || 'Error occurred while removing warden', 'danger');
     }
   }
 

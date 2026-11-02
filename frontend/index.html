@@ -439,63 +439,6 @@
           </div>
         </section>
 
-        <!-- 6. Admin Gate & Attendance Log View -->
-        <section id="admin-gate-view" class="view-section">
-          <div class="banner-card card">
-            <div class="banner-content">
-              <h2><i class="fa-solid fa-qrcode"></i> Campus Gate Entry & Exit Audit Stream</h2>
-              <p>Real-time tracking of student entries and exits verified against live MySQL attendance records.</p>
-            </div>
-            <div class="banner-actions">
-              <button class="btn btn-secondary" onclick="app.copyQRToken('admin-qr-token-text')">
-                <i class="fa-solid fa-copy"></i> Copy Hostel QR Token
-              </button>
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;" class="admin-grid-wrap">
-            <div class="card">
-              <div class="filter-bar" style="padding: 0; margin-bottom: 1rem; border: none; background: transparent;">
-                <div class="search-box" style="flex: 1;">
-                  <i class="fa-solid fa-magnifying-glass"></i>
-                  <input type="text" id="admin-gate-search" placeholder="Search student name or ID..." onkeyup="app.renderAdminGateView()">
-                </div>
-                <div class="filter-group">
-                  <select id="admin-gate-type-filter" class="select-input" onchange="app.renderAdminGateView()">
-                    <option value="all">All Movements</option>
-                    <option value="IN">Gate IN</option>
-                    <option value="OUT">Gate OUT</option>
-                  </select>
-                </div>
-              </div>
-              <div class="table-responsive">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Room</th>
-                      <th>Movement</th>
-                      <th>Timestamp</th>
-                      <th>Audit Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="admin-gate-table-body">
-                    <!-- Rendered dynamically -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card" style="text-align: center;">
-              <h3><i class="fa-solid fa-qrcode"></i> Official Hostel Gate QR</h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Students scan this code at security checkpoints to record gate entry & exit.</p>
-              <div style="background: white; padding: 1rem; border-radius: var(--radius-md); display: inline-block; margin-bottom: 1rem;">
-                <img id="admin-qr-image" alt="Hostel Common Gate QR" style="width: 180px; height: 180px; display: block;" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=HOSTEL-HUB-COMMON-GATE-QR-2026">
-              </div>
-              <div style="font-size: 0.8rem; word-break: break-all; color: var(--primary); font-weight: 600;" id="admin-qr-token-text">HOSTEL-HUB-COMMON-GATE-QR-2026</div>
-            </div>
-          </div>
-        </section>
         <!-- =========================================================================
              WARDEN VIEWS
              ========================================================================= -->
@@ -506,6 +449,23 @@
             <div class="banner-content">
               <h2><i class="fa-solid fa-envelope-open-text"></i> Student Leave Request Letter Approvals</h2>
               <p>Review leave letters submitted by students. Approve or reject leave with warden notes.</p>
+            </div>
+          </div>
+
+          <!-- Warden Officer Profile Summary Card -->
+          <div class="card" id="warden-profile-overview-card" style="margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding: 1.15rem 1.5rem; border-left: 4px solid var(--primary); background: var(--card-bg);">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.5rem;">
+                <i class="fa-solid fa-user-nurse"></i>
+              </div>
+              <div>
+                <h3 id="warden-dashboard-name" style="margin: 0; font-size: 1.18rem; font-weight: 700;">Warden Officer</h3>
+                <p id="warden-dashboard-meta" style="margin: 0.25rem 0 0; font-size: 0.86rem; color: var(--text-muted);">Assigned Block: Loading... | Email: Loading...</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 0.6rem; align-items: center;">
+              <span class="badge badge-ac" id="warden-dashboard-block-badge"><i class="fa-solid fa-building"></i> Block C</span>
+              <span class="badge badge-approved" id="warden-dashboard-id-badge"><i class="fa-solid fa-id-badge"></i> WRD-207</span>
             </div>
           </div>
 
@@ -620,63 +580,7 @@
           </div>
         </section>
 
-        <!-- 4. Warden Attendance & Gate Pass Log View -->
-        <section id="warden-gate-view" class="view-section">
-          <div class="banner-card card">
-            <div class="banner-content">
-              <h2><i class="fa-solid fa-door-open"></i> Block Student Attendance & Gate Logs</h2>
-              <p>Monitor real-time entry and exit movements of students residing in your assigned block.</p>
-            </div>
-            <div class="banner-actions">
-              <button class="btn btn-primary" onclick="app.renderWardenGateView()">
-                <i class="fa-solid fa-rotate"></i> Refresh Logs
-              </button>
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 1.5rem;" class="admin-grid-wrap">
-            <div class="card">
-              <div class="filter-bar" style="padding: 0; margin-bottom: 1rem; border: none; background: transparent;">
-                <div class="search-box" style="flex: 1;">
-                  <i class="fa-solid fa-magnifying-glass"></i>
-                  <input type="text" id="warden-gate-search" placeholder="Search student name or ID..." onkeyup="app.renderWardenGateView()">
-                </div>
-                <div class="filter-group">
-                  <select id="warden-gate-type-filter" class="select-input" onchange="app.renderWardenGateView()">
-                    <option value="all">All Movements</option>
-                    <option value="IN">Gate IN</option>
-                    <option value="OUT">Gate OUT</option>
-                  </select>
-                </div>
-              </div>
-              <div class="table-responsive">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Room</th>
-                      <th>Movement</th>
-                      <th>Timestamp</th>
-                      <th>Verified Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="warden-gate-table-body">
-                    <!-- Rendered dynamically -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="card" style="text-align: center;">
-              <h3><i class="fa-solid fa-qrcode"></i> Block Gate QR Code</h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Displayed at warden check-post for student attendance check-ins.</p>
-              <div style="background: white; padding: 1rem; border-radius: var(--radius-md); display: inline-block; margin-bottom: 1rem;">
-                <img id="warden-qr-image" alt="Warden Gate QR" style="width: 180px; height: 180px; display: block;" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=HOSTEL-HUB-COMMON-GATE-QR-2026">
-              </div>
-              <div style="font-size: 0.8rem; word-break: break-all; color: var(--primary); font-weight: 600;" id="warden-qr-token-text">HOSTEL-HUB-COMMON-GATE-QR-2026</div>
-            </div>
-          </div>
-        </section>        <!-- =========================================================================
+        <!-- =========================================================================
              STUDENT VIEWS
              ========================================================================= -->
 
@@ -906,58 +810,7 @@
           </div>
         </section>
 
-        <!-- 6. Student Gate Pass & Attendance View -->
-        <section id="student-gate-view" class="view-section">
-          <div class="banner-card card">
-            <div class="banner-content">
-              <h2><i class="fa-solid fa-id-badge"></i> Digital Gate Pass & Attendance Check-In</h2>
-              <p>Scan the hostel gate QR code upon entry and exit to maintain your automated attendance log.</p>
-            </div>
-            <div class="banner-actions">
-              <button class="btn btn-primary" onclick="app.simulateGateScan()">
-                <i class="fa-solid fa-qrcode"></i> Scan Hostel Gate QR
-              </button>
-            </div>
-          </div>
-
-          <div id="student-scan-result-banner" style="display: none; margin-bottom: 1.5rem; padding: 1rem; border-radius: var(--radius-md);"></div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 1.5rem;" class="leave-grid-wrap">
-            <div class="card">
-              <h3><i class="fa-solid fa-camera"></i> QR Pass Verification</h3>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Confirm entry or exit with security token.</p>
-              
-              <div style="background: var(--bg-primary); padding: 1.25rem; border-radius: var(--radius-md); text-align: center; margin-bottom: 1.25rem;">
-                <i class="fa-solid fa-shield-halved" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 0.75rem;"></i>
-                <h4 style="margin-bottom: 0.5rem;">Automated Notification Active</h4>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">Every verified scan instantly records timestamp in MySQL and notifies your block warden.</p>
-              </div>
-
-              <button class="btn btn-success" onclick="app.simulateGateScan()" style="width: 100%; justify-content: center; padding: 0.85rem;">
-                <i class="fa-solid fa-fingerprint"></i> Record IN / OUT Gate Scan
-              </button>
-            </div>
-
-            <div class="card">
-              <h3><i class="fa-solid fa-clock-rotate-left"></i> My Gate Movement & Attendance History</h3>
-              <div class="table-responsive" style="margin-top: 1rem;">
-                <table class="data-table">
-                  <thead>
-                    <tr>
-                      <th>Action</th>
-                      <th>Date & Time</th>
-                      <th>Room</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="student-gate-table-body">
-                    <!-- Rendered dynamically -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>      </div>
+      </div>
     </main>
   </div>
 
@@ -1133,6 +986,15 @@
           <div class="form-group">
             <label for="wrd-phone">Phone *</label>
             <input type="tel" id="wrd-phone" class="form-control" required placeholder="+1 (555) 000-0000">
+          </div>
+          <div class="form-group full-width">
+            <label for="wrd-password"><i class="fa-solid fa-key"></i> Warden Login Password *</label>
+            <div class="password-input-wrap">
+              <input type="password" id="wrd-password" class="form-control" required placeholder="Set warden login password (min 6 chars)...">
+              <button type="button" class="toggle-password-btn" onclick="app.toggleWardenModalPassword()">
+                <i class="fa-solid fa-eye" id="wrd-password-eye-icon"></i>
+              </button>
+            </div>
           </div>
         </div>
         <div class="modal-footer">

@@ -191,10 +191,18 @@ class Store {
       // Pre-fetch actual authenticated profile immediately
       if (role === 'student') {
         localStorage.setItem('hms_last_student_email', identifier);
+        localStorage.setItem('hms_last_student_pass', password);
         sessionStorage.setItem('hms_last_student_pass', password);
         await this.fetchCurrentStudent();
       } else if (role === 'warden') {
+        localStorage.setItem('hms_last_warden_email', identifier);
+        localStorage.setItem('hms_last_warden_pass', password);
+        sessionStorage.setItem('hms_last_warden_pass', password);
         await this.fetchCurrentWarden();
+      } else if (role === 'admin') {
+        localStorage.setItem('hms_last_admin_email', identifier);
+        localStorage.setItem('hms_last_admin_pass', password);
+        sessionStorage.setItem('hms_last_admin_pass', password);
       }
 
       await this.refreshAllData();
@@ -483,6 +491,14 @@ class Store {
     const res = await api.get('/wardens/me');
     if (res.success && res.data) {
       this.currentWarden = res.data;
+      if (this.currentUser) {
+        this.currentUser.name = res.data.name || this.currentUser.name;
+        this.currentUser.block = res.data.block || this.currentUser.block;
+        this.currentUser.email = res.data.email || this.currentUser.email;
+        this.currentUser.phone = res.data.phone || this.currentUser.phone;
+        this.currentUser.id = res.data.id || this.currentUser.id;
+        localStorage.setItem('hms_current_user', JSON.stringify(this.currentUser));
+      }
       return this.currentWarden;
     }
     return null;
